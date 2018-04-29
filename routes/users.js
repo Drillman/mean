@@ -66,8 +66,18 @@ router.get('/profile', passport.authenticate('jwt',{session:false}),(req,res,nex
 })
 
 // Validate
-router.get('/validate', (req,res,next) =>{
-    res.send('VALIDATE');
+router.post('/validate', (req,res,next) =>{
+    const email = req.body.email;
+
+    User.emailCheking(email, (err, user) => {
+        if(err) throw err;
+        if(user){
+            return res.json({existing:true});
+        }
+        else{
+            return res.json({existing:false});
+        }
+    })
 })
 
 module.exports = router;
