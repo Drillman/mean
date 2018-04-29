@@ -538,6 +538,10 @@ var RegisterComponent = /** @class */ (function () {
             this.flashMessages.show('Please enter a valid email', { cssClass: 'alert-danger', timeout: 3000 });
             return false;
         }
+        if (!this.validateService.ValidateExistingEmail(user.email)) {
+            this.flashMessages.show('This email is already taken', { cssClass: 'alert-danger', timeout: 3000 });
+            return false;
+        }
         //Register user
         this.authService.registerUser(user).subscribe(function (data) {
             if (data.success) {
@@ -666,6 +670,12 @@ var AuthService = /** @class */ (function () {
         return this.http.get('users/profile', { headers: headers })
             .map(function (res) { return res.json(); });
     };
+    AuthService.prototype.emailCheck = function (email) {
+        var headers = new __WEBPACK_IMPORTED_MODULE_1__angular_http__["Headers"]();
+        headers.append('Content-type', 'application/json');
+        return this.http.post('users/validate', email, { headers: headers })
+            .map(function (res) { return res.json(); });
+    };
     AuthService.prototype.storeUserData = function (token, user) {
         localStorage.setItem('id_token', token);
         localStorage.setItem('user', JSON.stringify(user));
@@ -694,6 +704,9 @@ var AuthService = /** @class */ (function () {
 "use strict";
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return ValidateService; });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__angular_core__ = __webpack_require__("./node_modules/@angular/core/esm5/core.js");
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__angular_http__ = __webpack_require__("./node_modules/@angular/http/esm5/http.js");
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_rxjs_add_operator_map__ = __webpack_require__("./node_modules/rxjs/_esm5/add/operator/map.js");
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__services_auth_service__ = __webpack_require__("./src/app/services/auth.service.ts");
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
     if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
@@ -704,8 +717,13 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 
+
+
+
 var ValidateService = /** @class */ (function () {
-    function ValidateService() {
+    function ValidateService(http, authService) {
+        this.http = http;
+        this.authService = authService;
     }
     ValidateService.prototype.validateRegister = function (user) {
         if (user.name == undefined || user.email == undefined || user.username == undefined || user.password == undefined || user.name == "" || user.email == "" || user.username == "" || user.password == "") {
@@ -715,13 +733,20 @@ var ValidateService = /** @class */ (function () {
             return true;
         }
     };
+    ValidateService.prototype.ValidateExistingEmail = function (email) {
+        // Database check
+        this.authService.emailCheck(email).subscribe(function (data) {
+            return !data.existing;
+        });
+    };
     ValidateService.prototype.validateEmail = function (email) {
+        // Regex check
         var re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
         return re.test(String(email).toLowerCase());
     };
     ValidateService = __decorate([
         Object(__WEBPACK_IMPORTED_MODULE_0__angular_core__["Injectable"])(),
-        __metadata("design:paramtypes", [])
+        __metadata("design:paramtypes", [__WEBPACK_IMPORTED_MODULE_1__angular_http__["Http"], __WEBPACK_IMPORTED_MODULE_3__services_auth_service__["a" /* AuthService */]])
     ], ValidateService);
     return ValidateService;
 }());
