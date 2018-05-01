@@ -67,17 +67,36 @@ router.get('/profile', passport.authenticate('jwt',{session:false}),(req,res,nex
 
 // Validate
 router.post('/validate', (req,res,next) =>{
-    const email = req.body.email;
+    const type = req.body.type;
 
-    User.emailCheking(email, (err, user) => {
-        if(err) throw err;
-        if(user){
-            return res.json({existing:true});
-        }
-        else{
-            return res.json({existing:false});
-        }
-    })
+    switch(type) {
+      case 'email': {
+        const email = req.body.value;
+        User.emailCheking(email, (err, user) => {
+            if(err) throw err;
+            if(user){
+                return res.json({existing:true});
+            }
+            else{
+                return res.json({existing:false});
+            }
+        });
+        break;
+      }
+    case 'username':{
+      const username = req.body.value;
+      User.getUserByUsername(username, (err, user) => {
+          if(err) throw err;
+          if(user){
+              return res.json({existing:true});
+          }
+          else{
+              return res.json({existing:false});
+          }
+      });
+      break;
+    }
+    }
 })
 
 module.exports = router;
