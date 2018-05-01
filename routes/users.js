@@ -70,32 +70,32 @@ router.post('/validate', (req,res,next) =>{
     const type = req.body.type;
 
     switch(type) {
-      case 'email': {
-        const email = req.body.value;
-        User.emailCheking(email, (err, user) => {
-            if(err) throw err;
-            if(user){
-                return res.json({existing:true});
-            }
-            else{
-                return res.json({existing:false});
-            }
-        });
-        break;
-      }
-    case 'username':{
-      const username = req.body.value;
-      User.getUserByUsername(username, (err, user) => {
-          if(err) throw err;
-          if(user){
-              return res.json({existing:true});
-          }
-          else{
-              return res.json({existing:false});
-          }
-      });
-      break;
-    }
+        case 'email': {
+            const email = req.body.value;
+            User.emailChecking(email, (err, user) => {
+                if(err) throw err;
+                if(user){
+                    return res.json({existing:true});
+                }
+                else{
+                    return res.json({existing:false});
+                }
+            });
+            break;
+        }
+        case 'username':{
+            const username = req.body.value;
+            User.getUserByUsername(username, (err, user) => {
+                if(err) throw err;
+                if(user){
+                    return res.json({existing:true});
+                }
+                else{
+                    return res.json({existing:false});
+                }
+            });
+            break;
+        }
     }
 })
 
