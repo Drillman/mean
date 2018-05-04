@@ -17,7 +17,15 @@ router.post('/register', (req,res,next) =>{
 
     User.addUser(newUser, (err,user) => {
         if(err){
-            res.json({success: false, msg: 'Failed to add user'});
+            if(err.errors.username){
+            res.json({success: false, msg: 'This username is already used'});
+            }
+            else if (err.errors.email){
+                res.json({success: false, msg: 'This email is already used'});
+            }
+            else{
+                res.json({success: false, msg: 'Failed to add user'});
+            }
         } else {
             res.json({success: true, msg: 'The user is added'});
         }
